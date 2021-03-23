@@ -1,42 +1,39 @@
 #include <Arduino.h>
-#include <U8x8lib.h>
+#include <U8g2lib.h>
 
-U8X8_SH1106_128X64_NONAME_HW_I2C u8x8(/* reset=*/ U8X8_PIN_NONE);
+U8G2_SSD1306_128X32_UNIVISION_F_SW_I2C u8g2(U8G2_R0, /* clock=*/ 5, /* data=*/ 4, /* reset=*/ 16);
 
-const int AirValue = 500;   //you need to replace this value with Value_1
-const int WaterValue = 190;  //you need to replace this value with Value_2
+const int AirValue = 500;
+const int WaterValue = 190;
 int soilMoistureValue = 0;
 int soilmoisturepercent = 0;
-void setup() {
-    Serial.begin(9600); // open serial port, set the baud rate to 9600 bps
 
-    u8x8.begin();
-    u8x8.setPowerSave(0);
+void setup() {
+    Serial.begin(9600);
+
+    u8g2.begin();
+    u8g2.setPowerSave(0);
 }
+
 void loop() {
-    soilMoistureValue = analogRead(A0);  //put Sensor insert into soil
+    soilMoistureValue = analogRead(A0);
     Serial.println(soilMoistureValue);
     soilmoisturepercent = map(soilMoistureValue, AirValue, WaterValue, 0, 100);
-    u8x8.setFont(u8x8_font_chroma48medium8_r);
-    if (soilmoisturepercent >= 100)
-    {
+    u8g2.setFont(u8g2_font_logisoso32_tf);
+    if (soilmoisturepercent >= 100) {
         Serial.println("100 %");
 
-        u8x8.drawString(0, 0, "100 %");
-    }
-    else if (soilmoisturepercent <= 0)
-    {
+        u8g2.drawUTF8(0, 0, "100 %");
+    } else if (soilmoisturepercent <= 0) {
         Serial.println("0 %");
 
-        u8x8.drawString(0, 0, "0 %");
-    }
-    else if (soilmoisturepercent > 0 && soilmoisturepercent < 100)
-    {
+        u8g2.drawUTF8(0, 0, "0 %");
+    } else if (soilmoisturepercent > 0 && soilmoisturepercent < 100) {
         Serial.print(soilmoisturepercent);
         Serial.println("%");
 
-        u8x8.drawString(0, 0, String(soilmoisturepercent).c_str());
-        u8x8.drawString(3, 0, "%");
+        u8g2.drawUTF8(0, 0, String(soilmoisturepercent).c_str());
+        u8g2.drawUTF8(3, 0, "%");
     }
 
     delay(5000);
